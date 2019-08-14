@@ -1,12 +1,11 @@
 import React from 'react';
-import { useTheme, Theme } from '@material-ui/core/styles';
+import {makeStyles, createStyles, useTheme, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { TablePaginationActionsProps } from './TablePaginationActionsProps';
-import { makeStyles, createStyles } from '@material-ui/styles';
 
 const useStyles1 = makeStyles((theme: Theme) =>
   createStyles({
