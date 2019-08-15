@@ -87,7 +87,6 @@ export default function RecordsTable(props: RecordsTableProps) {
   var paginationValues = [5,10,20,50,100,200,500];
   paginationValues = paginationValues.filter((value) => value < records.length);
   paginationValues.push(records.length);
-  console.log("paginationValues", paginationValues); 
   return (
     <Paper className={classes.root}>
       <div className={classes.tableWrapper}>
