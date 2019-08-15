@@ -16,14 +16,12 @@ export default class Store {
 
       return this.records.filter(
         (record:RecordData, index:number) => 
-          (
-            record.accountId
-            +record.caseUid
-            +record.creationDate
-            +record.publicId
-            +record.reference
-            +record.status
-          ).indexOf(this.searchString) !== -1
+          record.accountId.indexOf(this.searchString) !== -1 ||
+          record.caseUid.indexOf(this.searchString) !== -1 ||
+          record.creationDate.indexOf(this.searchString) !== -1 ||
+          record.publicId.indexOf(this.searchString) !== -1 ||
+          record.reference.indexOf(this.searchString) !== -1 ||
+          record.status.indexOf(this.searchString) !== -1
       )
   } 
 }

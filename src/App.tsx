@@ -20,15 +20,11 @@ export default class App extends Component {
 
   @action initRecords(data:RecordData[]) {
     this.store.records = data;
-    console.log(data);
-    //this.forceUpdate();
   }
   
   @action changeSearchString(event:KeyboardEvent<HTMLInputElement>){
     if (event && event.key === "Enter") {
-      console.log("changeSearchString ",(event.target as HTMLInputElement).value," key:", event.key);
       this.store.searchString = (event.target as HTMLInputElement).value;
-      //this.forceUpdate();
     }
   }
 
@@ -37,12 +33,12 @@ export default class App extends Component {
       <div className="App">          
         <header className="App-header">
            <p>exam-tooth-react-mobx-ts-sc-router-material</p>
-           <RecordsTable 
-              records={this.store.filteredRecords}
-              changeSearchString={this.changeSearchString}
-              searchString={this.store.searchString}
-           />
         </header>
+        <RecordsTable 
+          records={this.store.filteredRecords}
+          changeSearchString={this.changeSearchString}
+          searchString={this.store.searchString}
+        />
       </div>
     );
   }

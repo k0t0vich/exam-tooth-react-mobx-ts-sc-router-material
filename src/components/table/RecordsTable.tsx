@@ -77,13 +77,14 @@ export default function RecordsTable(
 
   function selectStringFragment(str:string,search:string = props.searchString){
     const arr = str.split(search);
-    if (arr.length == 1) return (str);
+    if (arr.length === 1) return (str);
+    var last:number = arr.length - 1;
     return (
-      arr.map (value => 
-        <span>
+      arr.map ((value,index) => 
+        <span key={index}>
           {value}
           <span style={{color:"red"}}>
-            <b>{search}</b>
+            <b>{index < last && search}</b>
           </span>
         </span>
       )
@@ -109,10 +110,10 @@ export default function RecordsTable(
             <StyledTableCell align="left">status</StyledTableCell>
           </TableRow>
         </TableHead>
-          <TableBody style={{ height: 200}}>
+          <TableBody>
             {records.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(record => (
               <TableRow key={record.caseUid}>
-                <TableCell component="th" scope="row">{record.reference}</TableCell>
+                <TableCell component="th" scope="row" >{selectStringFragment(record.reference)}</TableCell>
                 <TableCell align="left">{selectStringFragment(record.caseUid)}</TableCell>
                 <TableCell align="left">{selectStringFragment(record.accountId)}</TableCell>
                 <TableCell align="left">{selectStringFragment(record.creationDate)}</TableCell>
