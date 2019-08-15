@@ -9,7 +9,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TablePaginationActions from './TablePaginationActions';
-import RecordData from '../../data/RecordData';
+import RecordsTableProps from './RecordsTableProps';
 
 export const useStyles1 = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,13 +49,7 @@ createStyles({
 }),
 );
 
-export default function RecordsTable(
-  props: {
-    records:RecordData[], 
-    changeSearchString:(event:KeyboardEvent<HTMLInputElement>) =>void,
-    searchString:string
-  }
-    ) {
+export default function RecordsTable(props: RecordsTableProps) {
   const records = props.records;
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
