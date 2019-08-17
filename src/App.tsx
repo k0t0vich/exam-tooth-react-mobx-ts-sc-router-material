@@ -13,14 +13,7 @@ export default class App extends Component {
   private store: Store = new Store();
 
   componentDidMount() {
-    this.changeSearchString = this.changeSearchString.bind(this);
     this.store.loadData();
-  }
-
-  changeSearchString(event: KeyboardEvent<HTMLInputElement>) {
-    if (event && event.key === "Enter") {
-      this.store.changeSearchString((event.target as HTMLInputElement).value);
-    }
   }
 
   render() {
@@ -34,7 +27,6 @@ export default class App extends Component {
               {() => (
                 <div className="App">
                   <RecordsTable
-                    changeSearchString={this.changeSearchString}
                     store={this.store}
                   />
                 </div>

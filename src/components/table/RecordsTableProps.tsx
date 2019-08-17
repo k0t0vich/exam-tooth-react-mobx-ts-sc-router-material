@@ -1,12 +1,14 @@
 import { KeyboardEvent } from "react";
 import RecordData from "../../data/RecordData";
+import TableData from '../../data/TableData';
 
 export default interface RecordsTableProps {
-  changeSearchString: (event: KeyboardEvent<HTMLInputElement>) => void;
-  store?: RecordsTableStore;
+  store: RecordsTableStore;
 }
 
 export interface RecordsTableStore {
-  records: RecordData[];
+  changeSearchString: (searchString: string) => void;
+  filteredRecords: RecordData[];
   searchString: string;
+  tableData:TableData;
 }

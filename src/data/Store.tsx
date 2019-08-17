@@ -1,10 +1,12 @@
 import RecordData from "../data/RecordData";
 import { observable, computed, action } from "mobx";
 import DataLoader from "../services/DataLoader";
+import TableData from './TableData';
 
 export default class Store {
   @observable records: RecordData[] = [];
   @observable searchString: string = "";
+  @observable tableData:TableData = new TableData();
 
   loadData(){
       DataLoader.load<RecordData[]>("/testData.json").then((data: RecordData[]) =>

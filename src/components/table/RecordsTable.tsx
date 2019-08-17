@@ -1,4 +1,4 @@
-import React, { KeyboardEvent } from "react";
+import React, { KeyboardEvent, Component } from "react";
 import {
   makeStyles,
   withStyles,
@@ -16,17 +16,7 @@ import Paper from "@material-ui/core/Paper";
 import TablePaginationActions from "./TablePaginationActions";
 import RecordsTableProps from "./RecordsTableProps";
 import { Link } from "react-router-dom";
-import { inject } from "mobx-react";
-
-export const useStyles1 = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      flexShrink: 0,
-      color: theme.palette.text.secondary,
-      marginLeft: theme.spacing(2.5)
-    }
-  })
-);
+import { observer } from "mobx-react";
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -40,133 +30,138 @@ const StyledTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: "100%",
-      marginTop: theme.spacing(3)
-    },
-    table: {
-      minWidth: 500,
-      minHeight: 200
-    },
-    tableWrapper: {
-      overflowX: "auto"
-    }
-  })
-);
-
-//TODO extract to class
 //@inject("store")
-//@observer
-export default function RecordsTable(props: RecordsTableProps) {
-  const records = props!.store!.records;
-  const classes = useStyles();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+@observer
+export default class RecordsTable extends Component<RecordsTableProps> {
+  classes = { root: "App", tableWrapper: "App", table: "App" };
+  constructor(props: RecordsTableProps) {
+    super(props);
+  }
 
-  function handleChangePage(
+  componentDidMount() {
+    this.changeSearchString = this.changeSearchString.bind(this);
+    this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
+    this.handleChangePage = this.handleChangePage.bind(this);
+  }
+
+  handleChangePage(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
     newPage: number
   ) {
-    setPage(newPage);
+    this.props.store.tableData.setPage(newPage);
   }
 
-  function handleChangeRowsPerPage(
+  handleChangeRowsPerPage(
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    this.props.store.tableData.setRowsPerPage(parseInt(event.target.value, 10));
+    this.props.store.tableData.setPage(0);
   }
 
-  function selectStringFragment(
+  selectStringFragment(
     str: string,
-    search: string = props!.store!.searchString
+    searchString: string = this.props.store.searchString
   ) {
-    const arr = str.split(search);
+    const arr = str.split(searchString);
     if (arr.length === 1) return str;
     var last: number = arr.length - 1;
     return arr.map((value, index) => (
       <span key={index}>
         {value}
         <span style={{ color: "red" }}>
-          <b>{index < last && search}</b>
+          <b>{index < last && searchString}</b>
         </span>
       </span>
     ));
   }
-  var paginationValues = [5, 10, 20, 50, 100, 200, 500];
-  paginationValues = paginationValues.filter(value => value < records.length);
-  paginationValues.push(records.length);
-  return (
-    <Paper className={classes.root}>
-      <div className={classes.tableWrapper}>
-        filter
-        <input
-          style={{ padding: 2, margin: 10 }}
-          onKeyDown={(event: KeyboardEvent<HTMLInputElement>) =>
-            props.changeSearchString(event)
-          }
-        />
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>reference</StyledTableCell>
-              <StyledTableCell align="left">caseUid</StyledTableCell>
-              <StyledTableCell align="left">accountId</StyledTableCell>
-              <StyledTableCell align="left">creationDate</StyledTableCell>
-              <StyledTableCell align="left">publicId</StyledTableCell>
-              <StyledTableCell align="left">status</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {records
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map(record => (
-                <TableRow key={record.caseUid}>
-                  <TableCell component="th" scope="row">
-                    <Link to={"card/:" + record.caseUid}>
-                      {selectStringFragment(record.reference)}
-                    </Link>
-                  </TableCell>
-                  <TableCell align="left">
-                    {selectStringFragment(record.caseUid)}
-                  </TableCell>
-                  <TableCell align="left">
-                    {selectStringFragment(record.accountId)}
-                  </TableCell>
-                  <TableCell align="left">
-                    {selectStringFragment(record.creationDate)}
-                  </TableCell>
-                  <TableCell align="left">
-                    {selectStringFragment(record.publicId)}
-                  </TableCell>
-                  <TableCell align="left">
-                    {selectStringFragment(record.status)}
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-          <TableFooter style={{ width: "100%", left: 10 }}>
-            <TableRow key="pagination">
-              <TablePagination
-                rowsPerPageOptions={paginationValues}
-                colSpan={3}
-                count={records.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: { "aria-label": "rows per page" },
-                  native: true
-                }}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
-    </Paper>
-  );
+
+  changeSearchString(event: KeyboardEvent<HTMLInputElement>) {
+    if (event && event.key === "Enter") {
+      this.props.store.changeSearchString(
+        (event.target as HTMLInputElement).value
+      );
+    }
+  }
+
+  render() {
+    var records = this.props.store.filteredRecords;
+    var paginationValues = [5, 10, 20, 50, 100, 200, 500];
+    paginationValues = paginationValues.filter(value => value < records.length);
+    paginationValues.push(records.length);
+
+    return (
+      <Paper className={this.classes.root}>
+        <div className={this.classes.tableWrapper}>
+          filter
+          <input
+            style={{ padding: 2, margin: 10 }}
+            onKeyDown={(event: KeyboardEvent<HTMLInputElement>) =>
+              this.changeSearchString(event)
+            }
+          />
+          <Table className={this.classes.table}>
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>reference</StyledTableCell>
+                <StyledTableCell align="left">caseUid</StyledTableCell>
+                <StyledTableCell align="left">accountId</StyledTableCell>
+                <StyledTableCell align="left">creationDate</StyledTableCell>
+                <StyledTableCell align="left">publicId</StyledTableCell>
+                <StyledTableCell align="left">status</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {records
+                .slice(
+                  this.props.store.tableData.start,
+                  this.props.store.tableData.end
+                )
+                .map(record => (
+                  <TableRow key={record.caseUid}>
+                    <TableCell component="th" scope="row">
+                      <Link to={"card/:" + record.caseUid}>
+                        {this.selectStringFragment(record.reference)}
+                      </Link>
+                    </TableCell>
+                    <TableCell align="left">
+                      {this.selectStringFragment(record.caseUid)}
+                    </TableCell>
+                    <TableCell align="left">
+                      {this.selectStringFragment(record.accountId)}
+                    </TableCell>
+                    <TableCell align="left">
+                      {this.selectStringFragment(record.creationDate)}
+                    </TableCell>
+                    <TableCell align="left">
+                      {this.selectStringFragment(record.publicId)}
+                    </TableCell>
+                    <TableCell align="left">
+                      {this.selectStringFragment(record.status)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+            <TableFooter style={{ width: "100%", left: 10 }}>
+              <TableRow key="pagination">
+                <TablePagination
+                  rowsPerPageOptions={paginationValues}
+                  colSpan={3}
+                  count={records.length}
+                  rowsPerPage={this.props.store.tableData.rowsPerPage}
+                  page={this.props.store.tableData.page}
+                  SelectProps={{
+                    inputProps: { "aria-label": "rows per page" },
+                    native: true
+                  }}
+                  onChangePage={this.handleChangePage}
+                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </div>
+      </Paper>
+    );
+  }
 }
