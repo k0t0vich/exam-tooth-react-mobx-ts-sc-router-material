@@ -15,8 +15,12 @@ export default class Store {
   }
 
   @action initRecords(records: RecordData[]) {
+    console.log("initRecords");
     this.records = records;
+    this.tableData.initRows();
   }
+
+
 
   @action changeSearchString(searchString:string){
     this.searchString = searchString;
@@ -41,7 +45,7 @@ export default class Store {
   @computed get filteredRecords(): RecordData[] {
     if (this.searchString === "") return this.records;
 
-    return this.records.filter(
+     let result = this.records.filter(
       (record: RecordData, index: number) =>
         record.accountId.indexOf(this.searchString) !== -1 ||
         record.caseUid.indexOf(this.searchString) !== -1 ||
@@ -50,5 +54,11 @@ export default class Store {
         record.reference.indexOf(this.searchString) !== -1 ||
         record.status.indexOf(this.searchString) !== -1
     );
+    this.tableData.recordsLength = result.length;
+    return result;
+  }
+
+  @computed get visibleRecords():RecordData[] {
+    return this.filteredRecords.slice(this.tableData.start,this.tableData.end);
   }
 }

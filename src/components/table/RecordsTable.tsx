@@ -16,7 +16,7 @@ import Paper from "@material-ui/core/Paper";
 import TablePaginationActions from "./TablePaginationActions";
 import RecordsTableProps from "./RecordsTableProps";
 import { Link } from "react-router-dom";
-import { observer } from "mobx-react";
+import { observer, inject, Observer } from "mobx-react";
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -30,7 +30,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-//@inject("store")
+@inject("store")
 @observer
 export default class RecordsTable extends Component<RecordsTableProps> {
   classes = { root: "App", tableWrapper: "App", table: "App" };
@@ -48,19 +48,19 @@ export default class RecordsTable extends Component<RecordsTableProps> {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
     newPage: number
   ) {
-    this.props.store.tableData.setPage(newPage);
+    this.props.store!.tableData.setPage(newPage);
   }
 
   handleChangeRowsPerPage(
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    this.props.store.tableData.setRowsPerPage(parseInt(event.target.value, 10));
-    this.props.store.tableData.setPage(0);
+    this.props.store!.tableData.setRowsPerPage(parseInt(event.target.value, 10));
+    this.props.store!.tableData.setPage(0);
   }
 
   selectStringFragment(
     str: string,
-    searchString: string = this.props.store.searchString
+    searchString: string = this.props.store!.searchString
   ) {
     const arr = str.split(searchString);
     if (arr.length === 1) return str;
@@ -77,29 +77,26 @@ export default class RecordsTable extends Component<RecordsTableProps> {
 
   changeSearchString(event: KeyboardEvent<HTMLInputElement>) {
     if (event && event.key === "Enter") {
-      this.props.store.changeSearchString(
+      this.props.store!.changeSearchString(
         (event.target as HTMLInputElement).value
       );
     }
   }
 
   render() {
-    var records = this.props.store.filteredRecords;
-    var paginationValues = [5, 10, 20, 50, 100, 200, 500];
-    paginationValues = paginationValues.filter(value => value < records.length);
-    paginationValues.push(records.length);
-
+    console.log("render");
+    var records = this.props.store!.filteredRecords; 
     return (
-      <Paper className={this.classes.root}>
-        <div className={this.classes.tableWrapper}>
-          filter
+      <Paper>
+        <div>
+          {"filtered: "+ records.length + " " + this.props.store!.visibleRecords.length}
           <input
             style={{ padding: 2, margin: 10 }}
             onKeyDown={(event: KeyboardEvent<HTMLInputElement>) =>
               this.changeSearchString(event)
             }
           />
-          <Table className={this.classes.table}>
+          <Table>
             <TableHead>
               <TableRow>
                 <StyledTableCell>reference</StyledTableCell>
@@ -110,45 +107,41 @@ export default class RecordsTable extends Component<RecordsTableProps> {
                 <StyledTableCell align="left">status</StyledTableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {records
-                .slice(
-                  this.props.store.tableData.start,
-                  this.props.store.tableData.end
-                )
-                .map(record => (
-                  <TableRow key={record.caseUid}>
-                    <TableCell component="th" scope="row">
-                      <Link to={"card/:" + record.caseUid}>
-                        {this.selectStringFragment(record.reference)}
-                      </Link>
-                    </TableCell>
-                    <TableCell align="left">
-                      {this.selectStringFragment(record.caseUid)}
-                    </TableCell>
-                    <TableCell align="left">
-                      {this.selectStringFragment(record.accountId)}
-                    </TableCell>
-                    <TableCell align="left">
-                      {this.selectStringFragment(record.creationDate)}
-                    </TableCell>
-                    <TableCell align="left">
-                      {this.selectStringFragment(record.publicId)}
-                    </TableCell>
-                    <TableCell align="left">
-                      {this.selectStringFragment(record.status)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
+              <TableBody>
+                {
+                  this.props.store!.visibleRecords.map(record => (
+                    <TableRow key={record.caseUid}>
+                      <TableCell component="th" scope="row">
+                        <Link to={"card/:" + record.caseUid}>
+                          {this.selectStringFragment(record.reference)}
+                        </Link>
+                      </TableCell>
+                      <TableCell align="left">
+                        {this.selectStringFragment(record.caseUid)}
+                      </TableCell>
+                      <TableCell align="left">
+                        {this.selectStringFragment(record.accountId)}
+                      </TableCell>
+                      <TableCell align="left">
+                        {this.selectStringFragment(record.creationDate)}
+                      </TableCell>
+                      <TableCell align="left">
+                        {this.selectStringFragment(record.publicId)}
+                      </TableCell>
+                      <TableCell align="left">
+                        {this.selectStringFragment(record.status)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
             <TableFooter style={{ width: "100%", left: 10 }}>
               <TableRow key="pagination">
                 <TablePagination
-                  rowsPerPageOptions={paginationValues}
+                  rowsPerPageOptions={this.props.store!.tableData.paginationValues}
                   colSpan={3}
                   count={records.length}
-                  rowsPerPage={this.props.store.tableData.rowsPerPage}
-                  page={this.props.store.tableData.page}
+                  rowsPerPage={this.props.store!.tableData.rowsPerPage}
+                  page={this.props.store!.tableData.page}
                   SelectProps={{
                     inputProps: { "aria-label": "rows per page" },
                     native: true

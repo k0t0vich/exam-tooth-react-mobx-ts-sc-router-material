@@ -1,5 +1,5 @@
 import React, { Component, KeyboardEvent } from "react";
-import { Observer } from "mobx-react";
+import { Provider, observer } from "mobx-react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import Store from "./data/Store";
@@ -9,8 +9,14 @@ import Card from "./components/card/Card";
 
 import "./App.css";
 
-export default class App extends Component {
-  private store: Store = new Store();
+@observer
+export default class App extends Component<{}, {}> {
+  store: Store;
+
+  constructor(props: {}) {
+    super(props);
+    this.store = new Store();
+  }
 
   componentDidMount() {
     this.store.loadData();
@@ -23,15 +29,9 @@ export default class App extends Component {
           path="/"
           exact
           render={_ => (
-            <Observer>
-              {() => (
-                <div className="App">
-                  <RecordsTable
-                    store={this.store}
-                  />
-                </div>
-              )}
-            </Observer>
+            <Provider store={this.store}>
+              <RecordsTable />
+            </Provider>
           )}
         />
         <Route path="/card/:caseUid" component={Card} />
