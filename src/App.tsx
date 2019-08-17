@@ -1,46 +1,49 @@
 import React, { Component, KeyboardEvent } from "react";
-import "./App.css";
-import RecordsTable from "./components/table/RecordsTable";
-import DataLoader from "./services/DataLoader";
-import RecordData from "./data/RecordData";
-import Store from "./data/Store";
-import { observer } from "mobx-react";
-import { action } from "mobx";
+import { Observer } from "mobx-react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
-@observer
+import Store from "./data/Store";
+import RecordsTable from "./components/table/RecordsTable";
+import LoginDialog from "./components/login/LoginDialog";
+import Card from "./components/card/Card";
+
+import "./App.css";
+
 export default class App extends Component {
-  store: Store = new Store();
+  private store: Store = new Store();
 
   componentDidMount() {
     this.changeSearchString = this.changeSearchString.bind(this);
-
-    DataLoader.load<RecordData[]>("testData.json").then((data: RecordData[]) =>
-      this.initRecords(data)
-    );
+    this.store.loadData();
   }
 
-  @action initRecords(data: RecordData[]) {
-    this.store.records = data;
-  }
-
-  @action changeSearchString(event: KeyboardEvent<HTMLInputElement>) {
+  changeSearchString(event: KeyboardEvent<HTMLInputElement>) {
     if (event && event.key === "Enter") {
-      this.store.searchString = (event.target as HTMLInputElement).value;
+      this.store.changeSearchString((event.target as HTMLInputElement).value);
     }
   }
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <p>exam-tooth-react-mobx-ts-sc-router-material</p>
-        </header>
-        <RecordsTable
-          records={this.store.filteredRecords}
-          changeSearchString={this.changeSearchString}
-          searchString={this.store.searchString}
+      <Router>
+        <Route
+          path="/"
+          exact
+          render={_ => (
+            <Observer>
+              {() => (
+                <div className="App">
+                  <RecordsTable
+                    changeSearchString={this.changeSearchString}
+                    store={this.store}
+                  />
+                </div>
+              )}
+            </Observer>
+          )}
         />
-      </div>
+        <Route path="/card/:caseUid" component={Card} />
+      </Router>
     );
   }
 }

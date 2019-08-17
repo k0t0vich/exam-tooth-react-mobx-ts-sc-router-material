@@ -1,13 +1,39 @@
 import RecordData from "../data/RecordData";
-import { observable, computed } from "mobx";
+import { observable, computed, action } from "mobx";
+import DataLoader from "../services/DataLoader";
 
 export default class Store {
   @observable records: RecordData[] = [];
-
   @observable searchString: string = "";
 
-  init(records: RecordData[]) {
+  loadData(){
+      DataLoader.load<RecordData[]>("/testData.json").then((data: RecordData[]) =>
+        this.initRecords(data)
+      );
+  }
+
+  @action initRecords(records: RecordData[]) {
     this.records = records;
+  }
+
+  @action changeSearchString(searchString:string){
+    this.searchString = searchString;
+  }
+
+  @computed get logged(){
+      return this.user !== null;
+  }
+
+  @computed get user(){
+    return localStorage.getItem("user");
+  }
+
+  @action saveUser(user:string){
+    localStorage.setItem("user", user);
+  }
+
+  @action clearUser(){
+    localStorage.removeItem("user");
   }
 
   @computed get filteredRecords(): RecordData[] {

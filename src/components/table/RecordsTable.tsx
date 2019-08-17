@@ -15,6 +15,8 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import TablePaginationActions from "./TablePaginationActions";
 import RecordsTableProps from "./RecordsTableProps";
+import { Link } from "react-router-dom";
+import { inject } from "mobx-react";
 
 export const useStyles1 = makeStyles((theme: Theme) =>
   createStyles({
@@ -54,8 +56,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+//TODO extract to class
+//@inject("store")
+//@observer
 export default function RecordsTable(props: RecordsTableProps) {
-  const records = props.records;
+  const records = props!.store!.records;
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -76,7 +81,7 @@ export default function RecordsTable(props: RecordsTableProps) {
 
   function selectStringFragment(
     str: string,
-    search: string = props.searchString
+    search: string = props!.store!.searchString
   ) {
     const arr = str.split(search);
     if (arr.length === 1) return str;
@@ -120,7 +125,9 @@ export default function RecordsTable(props: RecordsTableProps) {
               .map(record => (
                 <TableRow key={record.caseUid}>
                   <TableCell component="th" scope="row">
-                    {selectStringFragment(record.reference)}
+                    <Link to={"card/:" + record.caseUid}>
+                      {selectStringFragment(record.reference)}
+                    </Link>
                   </TableCell>
                   <TableCell align="left">
                     {selectStringFragment(record.caseUid)}
