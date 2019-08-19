@@ -24,7 +24,7 @@ export default class App extends Component {
       this.store.dataLoaded ? (
         <div>
           <Provider store={this.store}>
-            <LoginHeader userName={this.store.user} />
+            <LoginHeader/>
             <Router>
               <Switch>
                 <Route path="/" exact component={RecordsTable} />
