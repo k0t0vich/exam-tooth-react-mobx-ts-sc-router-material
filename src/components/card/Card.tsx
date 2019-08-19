@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import { StyledTableCell } from "../table/StyledTableCell";
 import { RECORD_DATA_KEYS, getRecordProperty } from "../../data/RecordData";
-import { Redirect, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function BackLink() {
   return (
