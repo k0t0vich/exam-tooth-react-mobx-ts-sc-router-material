@@ -1,3 +1,9 @@
 export default interface LoginHeaderProps {
-  userName: string;
+  userName: string | undefined;
+  store?:LoginHeaderStore;
+}
+
+interface LoginHeaderStore {
+  user:string;
+  clearUser():void; 
 }

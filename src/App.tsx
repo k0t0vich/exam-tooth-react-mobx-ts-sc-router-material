@@ -1,41 +1,49 @@
-import React, { Component, KeyboardEvent } from "react";
-import { Provider, observer } from "mobx-react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { observer, Provider } from "mobx-react";
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import Store from "./data/Store";
+import Card from "./components/card/Card";
 import RecordsTable from "./components/table/RecordsTable";
 import LoginDialog from "./components/login/LoginDialog";
-import Card from "./components/card/Card";
+import LoginHeader from "./components/login/LoginHeader";
+import Store from "./data/Store";
 
 import "./App.css";
 
 @observer
-export default class App extends Component<{}, {}> {
-  store: Store;
-
-  constructor(props: {}) {
-    super(props);
-    this.store = new Store();
-  }
+export default class App extends Component {
+  store: Store = new Store();
 
   componentDidMount() {
-    this.store.loadData();
+    if (this.store.isLogin) this.store.loadData();
   }
 
   render() {
-    return (
-      <Router>
-        <Route
-          path="/"
-          exact
-          render={_ => (
-            <Provider store={this.store}>
-              <RecordsTable />
-            </Provider>
-          )}
-        />
-        <Route path="/card/:caseUid" component={Card} />
-      </Router>
+    return this.store.isLogin ? (
+      this.store.dataLoaded ? (
+        <div>
+          <Provider store={this.store}>
+            <LoginHeader userName={this.store.user} />
+            <Router>
+              <Switch>
+                <Route path="/" exact component={RecordsTable} />
+                <Route path="/card/:caseUid" exact component={Card} />
+                <Route component={RecordsTable} />
+              </Switch>
+            </Router>
+          </Provider>
+        </div>
+      ) : (
+        <div id="loading" className="App">
+          <CircularProgress size="100px" />
+          <div>loading data</div>
+        </div>
+      )
+    ) : (
+      <Provider store={this.store}>
+        <LoginDialog />
+      </Provider>
     );
   }
 }

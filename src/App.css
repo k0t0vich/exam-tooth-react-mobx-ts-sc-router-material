@@ -1,9 +1,9 @@
-.App {
+body .App {
   text-align: center;
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #142d5f;
   min-height: 20px;
   display: flex;
   flex-direction: column;
@@ -11,4 +11,31 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+#loading {
+  padding: 20% 0;
+  color: darkblue;
+}
+
+.login-header-container {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.user-name {
+  text-align: right;
+  flex-grow: 1;
+  padding:0 20px;
+}
+
+.logout {
+  flex-grow: 1;
+  text-align: left;
+  padding:0 20px;
+}
+
+.back:a { 
+  text-decoration: none;
 }

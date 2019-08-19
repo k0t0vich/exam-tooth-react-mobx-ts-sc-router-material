@@ -1,51 +1,58 @@
 import RecordData from "../data/RecordData";
 import { observable, computed, action } from "mobx";
 import DataLoader from "../services/DataLoader";
-import TableData from './TableData';
+import TableData from "./TableData";
 
 export default class Store {
   @observable records: RecordData[] = [];
   @observable searchString: string = "";
-  @observable tableData:TableData = new TableData();
+  @observable tableData: TableData = new TableData();
+  @observable dataLoaded = false;
+  @observable user?:string;
 
-  loadData(){
-      DataLoader.load<RecordData[]>("/testData.json").then((data: RecordData[]) =>
-        this.initRecords(data)
-      );
+  constructor(){
+    this.readUser();
+  }
+
+  loadData() {
+    DataLoader.load<RecordData[]>("/testData.json").then((data: RecordData[]) =>
+      this.initRecords(data)
+    );
   }
 
   @action initRecords(records: RecordData[]) {
-    console.log("initRecords");
     this.records = records;
+    this.tableData.maxRaws = this.records.length;
     this.tableData.initRows();
+    this.dataLoaded = true;
   }
 
-
-
-  @action changeSearchString(searchString:string){
+  @action changeSearchString(searchString: string) {
     this.searchString = searchString;
   }
 
-  @computed get logged(){
-      return this.user !== null;
+  @computed get isLogin() {
+    return this.user !== undefined;
   }
 
-  @computed get user(){
-    return localStorage.getItem("user");
+  @observable readUser() {
+    this.user = localStorage.getItem("user") || undefined;
   }
 
-  @action saveUser(user:string){
+  @action saveUser(user: string) {
     localStorage.setItem("user", user);
+    this.readUser();
   }
 
-  @action clearUser(){
+  @action clearUser() {
     localStorage.removeItem("user");
+    this.readUser();
   }
 
   @computed get filteredRecords(): RecordData[] {
     if (this.searchString === "") return this.records;
 
-     let result = this.records.filter(
+    let result = this.records.filter(
       (record: RecordData, index: number) =>
         record.accountId.indexOf(this.searchString) !== -1 ||
         record.caseUid.indexOf(this.searchString) !== -1 ||
@@ -54,11 +61,22 @@ export default class Store {
         record.reference.indexOf(this.searchString) !== -1 ||
         record.status.indexOf(this.searchString) !== -1
     );
-    this.tableData.recordsLength = result.length;
+    this.tableData.maxRaws = result.length;
     return result;
   }
 
-  @computed get visibleRecords():RecordData[] {
-    return this.filteredRecords.slice(this.tableData.start,this.tableData.end);
+  @computed get visibleRecords(): RecordData[] {
+    let result = this.filteredRecords.slice(
+      this.tableData.start,
+      this.tableData.end
+    );
+    return result;
+  }
+
+  getRecordsByCaseId(caseUid: string): RecordData | undefined {
+    let result = this.records.find(
+      (record: RecordData) => record.caseUid === caseUid
+    );
+    return result;
   }
 }

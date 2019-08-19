@@ -1,3 +1,7 @@
 export default interface LoginDialogProps {
-  onLogin: () =>void;
+  store?:LoginDialogStore;
+}
+
+interface LoginDialogStore{
+  saveUser(user: string): void;
 }
