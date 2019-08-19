@@ -2,6 +2,7 @@
   "name": "exam-tooth-react-mobx-ts-sc-router-material",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://k0t0vich.github.io/react/exam-tooth-react-mobx-ts-sc-router-material/",
   "dependencies": {
     "@babel/core": "7.5.5",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
@@ -37,6 +38,7 @@
     "eslint-plugin-react-hooks": "^1.6.1",
     "file-loader": "3.0.1",
     "fs-extra": "7.0.1",
+    "gh-pages": "^2.1.1",
     "html-webpack-plugin": "4.0.0-beta.5",
     "identity-obj-proxy": "3.0.0",
     "is-wsl": "^1.1.0",
@@ -77,7 +79,9 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [
